@@ -19,10 +19,10 @@ class LocalConfig(Config):
     ENV = 'development'
     DEBUG = True
     TESTING = True
-    MYSQL_HOST = '0.0.0.0'
+    MYSQL_HOST = '127.0.0.1'
     MYSQL_PORT = 3306
     MYSQL_USER = 'root'
-    MYSQL_PASSWORD = 'root'
+    MYSQL_PASSWORD = 'Sugar3plus!'
     MYSQL_DB = 'flights'
 
 

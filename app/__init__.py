@@ -14,6 +14,9 @@ cors = CORS()
 migrate = Migrate()
 jwt = JWTManager()
 
+from app.main.models.flight import Flight
+from app.main.models.reservation import Reservation
+
 
 def error_handler(e):
     return "Something bad happened", 400
