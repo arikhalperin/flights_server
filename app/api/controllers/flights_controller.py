@@ -154,3 +154,8 @@ def get_flights(body=None):
     }
     return dict
 
+
+def upload(recording):
+    recording.save("/tmp/recording.wav")
+    response = {"status": "ok"}
+    return response

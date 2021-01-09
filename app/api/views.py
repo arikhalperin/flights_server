@@ -27,12 +27,6 @@ class ModifyFlight(MethodView):
         return make_response(modify_flight(request.json), 200)
 
 
-class DoSubtraction(MethodView):
-    def post(self, *args, **kwargs):
-        print(request)
-        return make_response(sub_numbers(request.json), 200)
-
-
 class AddReservation(MethodView):
     def post(self, *args, **kwargs):
         print(request)
@@ -65,6 +59,11 @@ class GetReservations(MethodView):
         return make_response(get_reservations(), 200)
 
 
+class Upload(MethodView):
+    def post(self):
+        return make_response(upload(request.files["recording"]), 200)
+
+
 add_flight_view = AddFlight.as_view("add_flight_view")
 remove_flight_view = RemoveFlight.as_view("remove_flight_view")
 modify_flight_view = ModifyFlight.as_view("modify_flight_view")
@@ -75,6 +74,8 @@ modify_reservation_view = ModifyReservation.as_view("modify_reservation_view")
 
 get_flights_view = GetFlights.as_view("get_flights_view")
 get_reservations_view = GetReservations.as_view("get_reservations_view")
+
+upload_view = Upload.as_view("upload_view")
 
 api.add_url_rule(
     '/v1/add_flight',
@@ -116,4 +117,7 @@ api.add_url_rule(
     view_func=get_reservations_view,
     methods=['GET'])
 
-
+api.add_url_rule(
+    '/v1/upload',
+    view_func=upload_view,
+    methods=['POST'])
