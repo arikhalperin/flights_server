@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime
 
 from app import Flight, db, Reservation
+from app.UTILS.GCSObjectStreamUpload import GCSObjectStreamUpload
 
 
 def add_flight(body):
@@ -157,5 +158,9 @@ def get_flights(body=None):
 
 def upload(recording):
     recording.save("/tmp/recording.wav")
+    f = open("/tmp/recording.wav", 'rb')
+
+    with GCSObjectStreamUpload(bucket_name="flightsorderbucket", blob_name="order.wav") as s:
+        s.write(f.read())
     response = {"status": "ok"}
     return response
