@@ -160,6 +160,7 @@ def get_flights(body=None):
 
 def transcribe_file(file_path):
         """Transcribe the given audio file."""
+        print("transcribing")
         client = speech.SpeechClient()
 
         with io.open(file_path, "rb") as audio_file:
@@ -168,12 +169,13 @@ def transcribe_file(file_path):
         audio = RecognitionAudio(content=content)
         config = RecognitionConfig(
             encoding=RecognitionConfig.AudioEncoding.LINEAR16,
-            sample_rate_hertz=16000,
+            sample_rate_hertz=8000,
             language_code="en-US",
         )
 
         response = client.recognize(config=config, audio=audio)
 
+        print(response)
         # Each result is for a consecutive portion of the audio. Iterate through
         # them to get the transcripts for the entire audio file.
         for result in response.results:
@@ -183,12 +185,6 @@ def transcribe_file(file_path):
 
 def upload(recording):
     recording.save("/tmp/recording.wav")
-    order = AudioSegment.from_wav("/tmp/recording.wav")
-    order.export("/tmp/recording.wav", format= "wav", bitrate="16k")
-  #  f = open("/tmp/recording.wav", 'rb')
-
-  #  with GCSObjectStreamUpload(bucket_name="flightsorderbucket", blob_name="order.wav") as s:
-  #      s.write(f.read())
     transcribe_file("/tmp/recording.wav")
 
     response = {"status": "ok"}
