@@ -1,3 +1,4 @@
+import io
 from datetime import timedelta, datetime
 
 from google.cloud import speech
