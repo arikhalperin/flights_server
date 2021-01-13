@@ -1,5 +1,7 @@
 from datetime import timedelta, datetime
 
+from pydub import AudioSegment
+
 from app import Flight, db, Reservation
 from app.UTILS.GCSObjectStreamUpload import GCSObjectStreamUpload
 
@@ -150,17 +152,44 @@ def get_flights(body=None):
             "landing": flight.landing.strftime("%d/%m/%y %H:%M:%S")
         }
         flights_response.append(fr)
-    dict = {
-        "flights": flights_response
-    }
+    dict= {"flights": flights_response}
     return dict
+
+def transcribe_file(file_path):
+        """Transcribe the given audio file."""
+        from google.cloud import speech
+        import io
+
+        client = speech.SpeechClient()
+
+        with io.open(file_path, "rb") as audio_file:
+            content = audio_file.read()
+
+        audio = speech.RecognitionAudio(content=content)
+        config = speech.RecognitionConfig(
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=16000,
+            language_code="en-US",
+        )
+
+        response = client.recognize(config=config, audio=audio)
+
+        # Each result is for a consecutive portion of the audio. Iterate through
+        # them to get the transcripts for the entire audio file.
+        for result in response.results:
+            # The first alternative is the most likely one for this portion.
+            print(u"Transcript: {}".format(result.alternatives[0].transcript))
 
 
 def upload(recording):
     recording.save("/tmp/recording.wav")
-    f = open("/tmp/recording.wav", 'rb')
+    order = AudioSegment.from_wav("/tmp/recording.wav")
+    order.export("/tmp/recording.wav", format= "wav", bitrate="16k")
+  #  f = open("/tmp/recording.wav", 'rb')
 
-    with GCSObjectStreamUpload(bucket_name="flightsorderbucket", blob_name="order.wav") as s:
-        s.write(f.read())
+  #  with GCSObjectStreamUpload(bucket_name="flightsorderbucket", blob_name="order.wav") as s:
+  #      s.write(f.read())
+    transcribe_file("/tmp/recording.wav")
+
     response = {"status": "ok"}
     return response

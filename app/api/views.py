@@ -4,7 +4,7 @@ from flask.views import MethodView
 from app.api import api
 from app.api.controllers.flights_controller import add_flight, \
     modify_flight, remove_flight, make_reservation, delete_reservation, modify_reservation, get_flights, \
-    get_reservations
+    get_reservations, upload
 
 
 # MVC : Model View Controller
