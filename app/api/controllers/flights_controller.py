@@ -1,5 +1,7 @@
 from datetime import timedelta, datetime
 
+from google.cloud import speech
+from google.cloud.speech_v1.proto.cloud_speech_pb2 import RecognitionAudio, RecognitionConfig
 from pydub import AudioSegment
 
 from app import Flight, db, Reservation
@@ -157,16 +159,13 @@ def get_flights(body=None):
 
 def transcribe_file(file_path):
         """Transcribe the given audio file."""
-        from google.cloud import speech
-        import io
-
         client = speech.SpeechClient()
 
         with io.open(file_path, "rb") as audio_file:
             content = audio_file.read()
 
-        audio = speech.RecognitionAudio(content=content)
-        config = speech.RecognitionConfig(
+        audio = RecognitionAudio(content=content)
+        config = RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
             language_code="en-US",
