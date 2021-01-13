@@ -167,7 +167,7 @@ def transcribe_file(file_path):
 
         audio = RecognitionAudio(content=content)
         config = RecognitionConfig(
-            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            encoding=RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
             language_code="en-US",
         )
