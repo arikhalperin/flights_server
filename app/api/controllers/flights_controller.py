@@ -1,4 +1,5 @@
 import io
+import json
 from datetime import timedelta, datetime
 
 from google.cloud import speech
@@ -7,6 +8,10 @@ from pydub import AudioSegment
 
 from app import Flight, db, Reservation
 from app.UTILS.GCSObjectStreamUpload import GCSObjectStreamUpload
+from app.UTILS.get_luis_result import get_luis_result
+from app.main.queries.BookingDetails import BookingDetails
+from app.main.queries.CancelBookingDetails import CancelBookingDetails
+from app.main.queries.EditBookingDetails import EditBookingDetails
 
 
 def add_flight(body):
@@ -37,7 +42,7 @@ def modify_flight(body):
     destination = body["destination"]
     departure = body["departure"]
 
-    departure = datetime.strptime(departure,"%d/%m/%y %H:%M:%S")
+    departure = datetime.strptime(departure, "%d/%m/%y %H:%M:%S")
 
     landing = body["landing"]
     landing = datetime.strptime(landing, "%d/%m/%y %H:%M:%S")
@@ -60,8 +65,8 @@ def make_reservation(body):
     reservation = Reservation.query.filter(Reservation.flight_id == flight_id, Reservation.user_id == user_id).first()
     if reservation is None:
         reservation = Reservation(flight_id=flight_id, user_id=user_id, number_of_seats=number_of_seats)
-        flight = Flight.query.filter(Flight.id==flight_id).first()
-        flight.capacity = flight.capacity-number_of_seats
+        flight = Flight.query.filter(Flight.id == flight_id).first()
+        flight.capacity = flight.capacity - number_of_seats
         db.session.add(reservation)
         db.session.commit()
     return {"status": "OK"}
@@ -138,8 +143,9 @@ def get_flights(body=None):
         time = body["time"]
         number_of_seats = body["number_of_seats"]
         flights = Flight.query.filter(Flight.capacity >= number_of_seats,
-                                     Flight.departure > (time-timedelta(hours=24) and Flight.departure<(time+timedelta(hours=24)),
-                                     Flight.source == source, Flight.destination == destination).all())
+                                      Flight.departure > (
+                                      time - timedelta(hours=24) and Flight.departure < (time + timedelta(hours=24)),
+                                      Flight.source == source, Flight.destination == destination).all())
     else:
         flights = Flight.query.all()
 
@@ -155,37 +161,125 @@ def get_flights(body=None):
             "landing": flight.landing.strftime("%d/%m/%y %H:%M:%S")
         }
         flights_response.append(fr)
-    dict= {"flights": flights_response}
+    dict = {"flights": flights_response}
     return dict
 
+
 def transcribe_file(file_path):
-        """Transcribe the given audio file."""
-        print("transcribing")
-        client = speech.SpeechClient()
+    """Transcribe the given audio file."""
+    print("transcribing")
+    client = speech.SpeechClient()
 
-        with io.open(file_path, "rb") as audio_file:
-            content = audio_file.read()
+    with io.open(file_path, "rb") as audio_file:
+        content = audio_file.read()
 
-        audio = RecognitionAudio(content=content)
-        config = RecognitionConfig(
-            encoding=RecognitionConfig.AudioEncoding.LINEAR16,
-            sample_rate_hertz=8000,
-            language_code="en-US",
-        )
+    audio = RecognitionAudio(content=content)
+    config = RecognitionConfig(
+        encoding=RecognitionConfig.AudioEncoding.LINEAR16,
+        sample_rate_hertz=8000,
+        language_code="en-US",
+    )
 
-        response = client.recognize(config=config, audio=audio)
+    response = client.recognize(config=config, audio=audio)
 
-        print(response)
-        # Each result is for a consecutive portion of the audio. Iterate through
-        # them to get the transcripts for the entire audio file.
-        for result in response.results:
-            # The first alternative is the most likely one for this portion.
-            print(u"Transcript: {}".format(result.alternatives[0].transcript))
+    print(response)
+
+    return response.results[0].alternatives[0].transcript;
+    # Each result is for a consecutive portion of the audio. Iterate through
+    # them to get the transcripts for the entire audio file.
+    # for result in response.results:
+    #    # The first alternative is the most likely one for this portion.
+    #    print(u"Transcript: {}".format(result.alternatives[0].transcript))
 
 
-def upload(recording):
-    recording.save("/tmp/recording.wav")
-    transcribe_file("/tmp/recording.wav")
+def parse_intent_from_args(data):
+    intent_type = data["intent_type"]
+    if intent_type == "BookFlight":
+        origin = None
+        destination = None
+        flight_date = None
+        capacity = None
+        user_id = None
 
-    response = {"status": "ok"}
+        if "origin" in data:
+            origin = data["origin"]
+
+        if "destination" in data:
+            destination = data["destination"]
+
+        if "travel_date" in data:
+            flight_date = data["travel_date"]
+
+        if "capacity" in data:
+            capacity = data["capacity"]
+
+        if "user_id" in data:
+            user_id = data["user_id"]
+
+        return BookingDetails(origin=origin, destination=destination,
+                              travel_date=flight_date, capacity=capacity, user_id=user_id)
+
+    if intent_type == "CancelBooking":
+        destination = None
+        flight_date = None
+        user_id = None
+
+        if "destination" in data:
+            destination = data["destination"]
+
+        if "travel_date" in data:
+            flight_date = data["travel_date"]
+
+        if "user_id" in data:
+            user_id = data["user_id"]
+
+        return CancelBookingDetails(destination=destination, travel_date=flight_date, user_id=user_id)
+
+    if intent_type == "EditBooking":
+        destination = None
+        flight_date = None
+        capacity = None
+        user_id = None
+
+        if "destination" in data:
+            destination = data["destination"]
+
+        if "travel_date" in data:
+            flight_date = data["travel_date"]
+
+        if "capacity" in data:
+            capacity = data["capacity"]
+
+        if "user_id" in data:
+            user_id = data["user_id"]
+
+        return EditBookingDetails(destination=destination,
+                              travel_date=flight_date, capacity=capacity, user_id=user_id)
+
+
+def upload(recording, args):
+    if args.get("interaction_type") == "voice":
+        recording.save("/tmp/recording.wav")
+        text = transcribe_file("/tmp/recording.wav")
+    else:
+        text = recording
+
+    data = args.get("data")
+
+    if data is None:
+        result = get_luis_result(text)
+        text = None
+    else:
+        data = json.loads(data)
+        result = parse_intent_from_args(data)
+
+    next = result.variable_to_ask_for(text)
+    if next is None:
+        status = result.finish_request()
+        response = {"status": status}
+    else:
+        response = {
+            "status": "more_data",
+            "data": result.to_dict(),
+            "next": next}
     return response

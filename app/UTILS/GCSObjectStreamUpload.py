@@ -75,3 +75,5 @@ class GCSObjectStreamUpload(object):
 
     def tell(self) -> int:
         return self._read
+
+

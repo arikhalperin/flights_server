@@ -1,0 +1,25 @@
+freeswitch->server: Recording, {}
+server->luis: get_intent
+
+1)
+server->freeswitch: OK
+fresswitch->User: Thank you, goodbye
+
+2) Misisng from:
+server->freeswitch: {"intent":"bookflight","data":{
+            "To":"newyork"
+                    }
+                    "ask_for":"origin"
+                    }
+                   }
+ freeswitch->user: From where ar you flying:?
+
+ freeswitch->server:
+    {"intent":"bookflight","data":{
+            "To":"newyork"
+                    }
+                    "ask_for":"origin"
+                    }
+                   }
+
+

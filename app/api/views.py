@@ -61,7 +61,10 @@ class GetReservations(MethodView):
 
 class Upload(MethodView):
     def post(self):
-        return make_response(upload(request.files["recording"]), 200)
+        if request.args.get("interaction_type")=="voice":
+            return make_response(upload(request.files["recording"], request.args), 200)
+        else:
+            return make_response(upload(request.args.get("text"), request.args), 200)
 
 
 add_flight_view = AddFlight.as_view("add_flight_view")
