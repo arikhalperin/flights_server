@@ -113,7 +113,7 @@ def record_message(session):
         "caller_id_number") + ".wav"
     result = do_http_upload("http://46.101.50.94:5000/v1/upload", filename)
 
-    get_data(session, result.json())
+    get_data(session, result)
 
     freeswitch.consoleLog("crit", "play goodbye")
     session.execute('playback', "/usr/share/freeswitch/sounds/yoav_goodbye.wav")

@@ -284,4 +284,5 @@ def upload(recording, args):
             "status": "more_data",
             "data": result.to_dict(),
             "next": next}
+        print(f"Response is {response}")
     return response
