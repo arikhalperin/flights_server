@@ -173,6 +173,7 @@ def transcribe_file(file_path):
     with io.open(file_path, "rb") as audio_file:
         content = audio_file.read()
 
+    print("Opended file")
     audio = RecognitionAudio(content=content)
     config = RecognitionConfig(
         encoding=RecognitionConfig.AudioEncoding.LINEAR16,
@@ -180,8 +181,9 @@ def transcribe_file(file_path):
         language_code="en-US",
     )
 
+    print("Calling google recognize")
     response = client.recognize(config=config, audio=audio)
-
+    print("Got response")
     print(response)
 
     return response.results[0].alternatives[0].transcript;
