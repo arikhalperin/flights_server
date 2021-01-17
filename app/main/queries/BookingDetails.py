@@ -53,10 +53,10 @@ class BookingDetails:
 
     def get_next_item(self):
         if self.origin is None:
-            return "from"
+            return "origin"
 
         if self.destination is None:
-            return "to"
+            return "destination"
 
         if self.travel_date is None:
             return "travel_date"
