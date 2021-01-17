@@ -278,6 +278,7 @@ def upload(recording, args):
     next = result.variable_to_ask_for(text)
     if next is None:
         status = result.finish_request()
+        print(f"Status is:{status}")
         response = {"status": status}
     else:
         response = {
