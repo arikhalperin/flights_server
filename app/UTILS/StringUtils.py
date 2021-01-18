@@ -40,4 +40,4 @@ def compare_date(date_to_compare, date_value):
     print(f"date1={date_1}")
     date_2 = parse(date_to_compare)
     print(f"date2={date_2}")
-    return date_1 == date_2
+    return date_1.year == date_2.year and date_1.month==date_2.month and date_1.day==date_2.day
