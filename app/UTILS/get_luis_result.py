@@ -21,6 +21,8 @@ def get_luis_result(query):
 
     result = result.json()
 
+    print(f"LUIS result:{result}")
+
     if result["prediction"]["topIntent"] == "BookFlight":
         origin = None
         destination = None
