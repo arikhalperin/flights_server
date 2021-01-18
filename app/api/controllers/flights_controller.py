@@ -277,7 +277,7 @@ def upload(recording, args):
 
     if data is None:
         result = get_luis_result(text)
-        text = None
+        text = "LUIS RESULT"
     else:
         print(f"Got data:{data}")
         data = json.loads(data)
