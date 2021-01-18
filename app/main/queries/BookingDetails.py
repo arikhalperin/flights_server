@@ -1,14 +1,16 @@
 from dateutil.parser import parse
 
 from app import Flight, Reservation, db
-from app.UTILS.StringUtils import convert_number
+from app.UTILS.StringUtils import convert_number, compare_date
 
 
 def extract_date(date_value):
+    print(f"Extracting date:{date_value}")
     month = date_value.month
     day = date_value.day
     year = date_value.year
-    return f"{day}.{month}.{year}"
+    result = f"{day}.{month}.{year}"
+
 
 class BookingDetails:
     def __init__(
@@ -91,7 +93,7 @@ class BookingDetails:
                 print(f"No match on origin:{self.destination}")
                 continue
 
-            if self.travel_date != extract_date(flight.departure):
+            if not compare_date(self.travel_date,flight.departure):
                 print(f"No match on date:{self.travel_date}")
                 continue
 

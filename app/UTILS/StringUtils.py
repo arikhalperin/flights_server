@@ -1,3 +1,7 @@
+from datetime import datetime
+
+import dateutil
+from dateutil.parser import parse
 
 
 def convert_number(num):
@@ -25,3 +29,13 @@ def convert_number(num):
         return 10
     else:
         return int(num)
+
+
+def compare_date(date_to_compare, date_value):
+    print(f"Extracting date:{date_value}")
+    month = date_value.month
+    day = date_value.day
+    year = date_value.year
+    date_1 = datetime(year=year, month=month, day=day)
+    date_2 = parse(date_to_compare)
+    return date_1 == date_2
