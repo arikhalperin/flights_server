@@ -42,7 +42,7 @@ class BookingDetails:
                 return
 
             if self.travel_date is None:
-                self.travel_date = dateutil.parse(value)
+                self.travel_date = dateutil.parser.parse(value)
                 return
 
             if self.capacity is None:
