@@ -34,7 +34,7 @@ class BookingDetails:
         return self.get_next_item()
 
     def update_previous_field_from(self, value):
-        if value is not "LUIS RESULT":
+        if value != "LUIS RESULT":
             print(f"Got value:{value}")
             if self.origin is None:
                 print("setting origin")
