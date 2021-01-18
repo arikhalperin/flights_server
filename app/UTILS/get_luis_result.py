@@ -46,7 +46,7 @@ def get_luis_result(query):
         else:
             if "Airport" in data:
                 airport_cell = data["Airport"]
-                destination = airport_cell["Airport"][0][0]
+                destination = airport_cell[0][0]
 
         if "Capacity" in data:
             capacity = data["Capacity"][0]
