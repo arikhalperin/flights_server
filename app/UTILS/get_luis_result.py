@@ -49,7 +49,7 @@ def get_luis_result(query):
                 destination = airport_cell[0][0]
 
         if "Capacity" in data:
-            capacity = data["Capacity"][0]
+            capacity = int(data["Capacity"][0])
 
         if "datetimeV2" in data:
             dateStruct = data["datetimeV2"]

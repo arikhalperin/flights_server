@@ -46,11 +46,11 @@ class BookingDetails:
                 return
 
             if self.capacity is None:
-                self.capacity = value
+                self.capacity = int(value)
                 return
 
             if self.user_id is None:
-                self.user_id = value
+                self.user_id = str(int(value))
                 return
 
     def get_next_item(self):
