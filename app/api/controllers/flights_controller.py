@@ -186,6 +186,9 @@ def transcribe_file(file_path):
     print("Got response")
     print(response)
 
+    if len(response.results)==0 or len(response.results[0].alternatives)==0:
+        return None
+    
     result = response.results[0].alternatives[0].transcript
 
     result = result.strip().lower()
@@ -278,8 +281,9 @@ def upload(recording, args):
     else:
         data = json.loads(data)
         result = parse_intent_from_args(data)
-
     try:
+        if text is None or text=="":
+            raise Exception()
         next = result.variable_to_ask_for(text)
         if next is None:
             status = result.finish_request()

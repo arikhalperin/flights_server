@@ -35,11 +35,14 @@ class BookingDetails:
 
     def update_previous_field_from(self, value):
         if value is not None:
+            print(f"Got value:{value}")
             if self.origin is None:
+                print("setting origin")
                 self.origin = value.lower()
                 return
 
             if self.destination is None:
+                print("setting destination")
                 self.destination = value.lower()
                 return
 
@@ -48,10 +51,12 @@ class BookingDetails:
                 return
 
             if self.capacity is None:
+                print("setting capacity")
                 self.capacity = convert_number(value)
                 return
 
             if self.user_id is None:
+                print("setting userid")
                 self.user_id = str(int(value))
                 return
 
