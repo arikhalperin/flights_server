@@ -1,4 +1,4 @@
-import dateutil
+from dateutil.parser import parse
 
 from app import Flight, Reservation, db
 
@@ -42,7 +42,7 @@ class BookingDetails:
                 return
 
             if self.travel_date is None:
-                self.travel_date = dateutil.parser.parse(value)
+                self.travel_date = parse(value)
                 return
 
             if self.capacity is None:
