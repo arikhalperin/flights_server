@@ -254,10 +254,10 @@ def parse_intent_from_args(data):
             flight_date = data["travel_date"]
 
         if "capacity" in data:
-            capacity = data["capacity"]
+            capacity = int(data["capacity"])
 
         if "user_id" in data:
-            user_id = data["user_id"]
+            user_id = str(int(data["user_id"]))
 
         return EditBookingDetails(destination=destination,
                               travel_date=flight_date, capacity=capacity, user_id=user_id)
@@ -279,15 +279,21 @@ def upload(recording, args):
         data = json.loads(data)
         result = parse_intent_from_args(data)
 
-    next = result.variable_to_ask_for(text)
-    if next is None:
-        status = result.finish_request()
-        print(f"Status is:{status}")
-        response = {"status": status}
-    else:
+    try:
+        next = result.variable_to_ask_for(text)
+        if next is None:
+            status = result.finish_request()
+            print(f"Status is:{status}")
+            response = {"status": status}
+        else:
+            response = {
+                "status": "more_data",
+                "data": result.to_dict(),
+                "next": next}
+            print(f"Response is {response}")
+    except Exception as e:
         response = {
             "status": "more_data",
-            "data": result.to_dict(),
-            "next": next}
-        print(f"Response is {response}")
+            "data": data,
+            "next": result.get_next_item()}
     return response
