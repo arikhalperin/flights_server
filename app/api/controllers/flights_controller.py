@@ -279,6 +279,7 @@ def upload(recording, args):
         result = get_luis_result(text)
         text = None
     else:
+        print(f"Got data:{data}")
         data = json.loads(data)
         result = parse_intent_from_args(data)
     try:
