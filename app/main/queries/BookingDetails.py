@@ -74,10 +74,10 @@ class BookingDetails:
 
         the_flight = None
         for flight in flights:
-            if self.origin != flight.source:
+            if self.origin.lower() != flight.source.lower():
                 continue
 
-            if self.destination != flight.destination:
+            if self.destination.lower() != flight.destination.lower():
                 continue
 
             if self.travel_date != extract_date(flight.departure):
