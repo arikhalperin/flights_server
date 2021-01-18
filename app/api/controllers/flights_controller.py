@@ -186,9 +186,11 @@ def transcribe_file(file_path):
     print("Got response")
     print(response)
 
-    result =  response.results[0].alternatives[0].transcript;
+    result = response.results[0].alternatives[0].transcript
 
     result = result.strip().lower()
+
+    return result
     # Each result is for a consecutive portion of the audio. Iterate through
     # them to get the transcripts for the entire audio file.
     # for result in response.results:

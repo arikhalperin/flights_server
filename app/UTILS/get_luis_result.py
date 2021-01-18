@@ -12,10 +12,10 @@ def get_luis_result(query):
                "query": query
                }
 
-    url = "https://westus.api.cognitive.microsoft.com/luis/prediction/v3.0/apps/8cff3032-986b-445c-bbc3-389d76c32ca7/slots/production/predict?subscription-key=8a5f7767dcef412d8ad42190b25166ea&verbose=true&show-all-intents=true&log=true&query="
+    url = "https://westus.api.cognitive.microsoft.com/luis/prediction/v3.0/apps/8cff3032-986b-445c-bbc3-389d76c32ca7/" \
+          "slots/production/predict"
 
-    url = url+query
-    result = requests.get(url)
+    result = requests.get(url, params=payload)
 
  #   print(result.json())
 
