@@ -188,7 +188,7 @@ def transcribe_file(file_path):
 
     if len(response.results)==0 or len(response.results[0].alternatives)==0:
         return None
-    
+
     result = response.results[0].alternatives[0].transcript
 
     result = result.strip().lower()
