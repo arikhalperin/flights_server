@@ -1,6 +1,8 @@
 from dateutil.parser import parse
 
 from app import Flight, Reservation, db
+from app.UTILS.StringUtils import convert_number
+
 
 def extract_date(date_value):
     month = date_value.month
@@ -46,7 +48,7 @@ class BookingDetails:
                 return
 
             if self.capacity is None:
-                self.capacity = int(value)
+                self.capacity = convert_number(value)
                 return
 
             if self.user_id is None:
