@@ -1,3 +1,5 @@
+import dateutil
+
 from app import Flight, Reservation, db
 
 def extract_date(date_value):
@@ -40,7 +42,7 @@ class BookingDetails:
                 return
 
             if self.travel_date is None:
-                self.travel_date = value
+                self.travel_date = dateutil.parse(value)
                 return
 
             if self.capacity is None:
