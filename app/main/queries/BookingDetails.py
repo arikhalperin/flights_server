@@ -34,11 +34,11 @@ class BookingDetails:
     def update_previous_field_from(self, value):
         if value is not None:
             if self.origin is None:
-                self.origin = value
+                self.origin = value.lower()
                 return
 
             if self.destination is None:
-                self.destination = value
+                self.destination = value.lower()
                 return
 
             if self.travel_date is None:
