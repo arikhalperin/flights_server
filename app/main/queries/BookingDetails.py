@@ -77,15 +77,19 @@ class BookingDetails:
         the_flight = None
         for flight in flights:
             if self.origin.lower() != flight.source.lower():
+                print(f"No match on origin:{self.origin}")
                 continue
 
             if self.destination.lower() != flight.destination.lower():
+                print(f"No match on origin:{self.destination}")
                 continue
 
             if self.travel_date != extract_date(flight.departure):
+                print(f"No match on date:{self.travel_date}")
                 continue
 
             if int(self.capacity) > flight.capacity:
+                print(f"Too big a capacity:{self.capacity}")
                 continue
 
             the_flight = flight

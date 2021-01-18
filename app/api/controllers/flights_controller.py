@@ -292,6 +292,7 @@ def upload(recording, args):
                 "next": next}
             print(f"Response is {response}")
     except Exception as e:
+        print(str(e))
         response = {
             "status": "more_data",
             "data": data,
