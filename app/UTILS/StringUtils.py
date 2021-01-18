@@ -37,5 +37,7 @@ def compare_date(date_to_compare, date_value):
     day = date_value.day
     year = date_value.year
     date_1 = datetime(year=year, month=month, day=day)
+    print(f"date1={date_1}")
     date_2 = parse(date_to_compare)
+    print(f"date2={date_2}")
     return date_1 == date_2
