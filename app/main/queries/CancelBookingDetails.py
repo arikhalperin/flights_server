@@ -1,3 +1,5 @@
+from dateutil.parser import parse
+
 from app import Flight, Reservation, db
 from app.UTILS.StringUtils import compare_date
 from app.main.queries.BookingDetails import extract_date
@@ -29,11 +31,12 @@ class CancelBookingDetails:
                 return
 
             if self.travel_date is None:
-                self.travel_date = value
+                self.travel_date = parse(value)
                 return
 
             if self.user_id is None:
-                self.user_id = value
+                print("setting userid")
+                self.user_id = str(int(value))
                 return
 
     def get_next_item(self):
