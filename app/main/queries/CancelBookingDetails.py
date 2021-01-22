@@ -56,6 +56,10 @@ class CancelBookingDetails:
             if self.travel_date != extract_date(flight.departure):
                 continue
 
+            if self.destination.lower() != flight.destination.lower():
+                print(f"No match on destination:{self.destination}")
+                continue
+
             the_reservation = reservation
             break
 

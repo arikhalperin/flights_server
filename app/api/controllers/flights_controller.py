@@ -283,7 +283,7 @@ def upload(recording, args):
         data = json.loads(data)
         result = parse_intent_from_args(data)
     try:
-        if text is None or text=="":
+        if text is None or text == "":
             raise Exception()
         next = result.variable_to_ask_for(text)
         if next is None:

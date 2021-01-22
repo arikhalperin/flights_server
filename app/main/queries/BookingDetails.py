@@ -90,7 +90,7 @@ class BookingDetails:
                 continue
 
             if self.destination.lower() != flight.destination.lower():
-                print(f"No match on origin:{self.destination}")
+                print(f"No match on destination:{self.destination}")
                 continue
 
             if not compare_date(self.travel_date,flight.departure):
