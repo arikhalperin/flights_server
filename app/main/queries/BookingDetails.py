@@ -111,7 +111,6 @@ class BookingDetails:
         body = {"flight_id": the_flight.id,"number_of_seats": self.capacity,"user_id": self.user_id}
         return make_reservation(body)
 
-
     def to_dict(self):
         result = {
             "intent_type": "BookFlight",

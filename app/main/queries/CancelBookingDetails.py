@@ -57,7 +57,8 @@ class CancelBookingDetails:
         for reservation in reservations:
             flight = Flight.query.filter(Flight.id == reservation.flight_id).first()
 
-            if self.travel_date != extract_date(flight.departure):
+            if not compare_date(self.travel_date, flight.departure):
+                print(f"No match on date:{self.travel_date}")
                 continue
 
             if self.destination.lower() != flight.destination.lower():
