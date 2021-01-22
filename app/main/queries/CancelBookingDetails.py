@@ -1,4 +1,5 @@
 from app import Flight, Reservation, db
+from app.UTILS.StringUtils import compare_date
 from app.main.queries.BookingDetails import extract_date
 
 
@@ -58,6 +59,10 @@ class CancelBookingDetails:
 
             if self.destination.lower() != flight.destination.lower():
                 print(f"No match on destination:{self.destination}")
+                continue
+
+            if not compare_date(self.travel_date,flight.departure):
+                print(f"No match on date:{self.travel_date}")
                 continue
 
             the_reservation = reservation
