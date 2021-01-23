@@ -25,9 +25,11 @@ class CancelBookingDetails:
         return self.get_next_item()
 
     def update_previous_field_from(self, value):
-        if value is not None:
+        if value != "LUIS RESULT":
+            print(f"Got value:{value}")
             if self.destination is None:
-                self.destination = value
+                print("setting destination")
+                self.destination = value.lower()
                 return
 
             if self.travel_date is None:
@@ -38,6 +40,8 @@ class CancelBookingDetails:
                 print("setting userid")
                 self.user_id = str(int(value))
                 return
+        else:
+            print("This is the LUIS result")
 
     def get_next_item(self):
         if self.destination is None:
