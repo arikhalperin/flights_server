@@ -105,7 +105,7 @@ class BookingDetails:
             break
 
         if the_flight is None:
-            return "no match"
+            return {"status":"no match"}
 
         from app.api.controllers.flights_controller import make_reservation
         body = {"flight_id": the_flight.id,"number_of_seats": self.capacity,"user_id": self.user_id}
