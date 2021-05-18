@@ -2,6 +2,7 @@ import requests
 
 from app.main.queries.BookingDetails import BookingDetails
 from app.main.queries.CancelBookingDetails import CancelBookingDetails
+from app.main.queries.EditBookingDetails import EditBookingDetails
 
 
 def get_luis_result(query):
@@ -17,12 +18,11 @@ def get_luis_result(query):
 
     result = requests.get(url, params=payload)
 
- #   print(result.json())
-
     result = result.json()
 
     print(f"LUIS result:{result}")
 
+    # Handle Book Flight
     if result["prediction"]["topIntent"] == "BookFlight":
         origin = None
         destination = None
@@ -33,11 +33,13 @@ def get_luis_result(query):
         data = result["prediction"]["entities"]
         print(data)
 
+        # Try to extract origin from LUIS Result
         if "From" in data:
             fromAirportStruct = data["From"]
             airport_cell = fromAirportStruct[0]
             origin = airport_cell["Airport"][0][0]
 
+        # Try to extract destination from LUIS Result
         if "To" in data:
             toAirportStruct = data["To"]
             airport_cell = toAirportStruct[0]
@@ -48,9 +50,11 @@ def get_luis_result(query):
                 airport_cell = data["Airport"]
                 destination = airport_cell[0][0]
 
+        # Try to extract capacity from LUIS Result
         if "Capacity" in data:
             capacity = int(data["Capacity"][0])
 
+        # Try to extract date from LUIS Result
         if "datetimeV2" in data:
             dateStruct = data["datetimeV2"]
             date_cell = dateStruct[0]
@@ -64,6 +68,7 @@ def get_luis_result(query):
         b = BookingDetails(origin=origin, destination=destination, capacity=capacity, travel_date=date, user_id=user_id)
         return b
 
+    # Handle Cancel Booking
     if result["prediction"]["topIntent"] == "CancelBooking":
         destination = None
         date = None
@@ -72,14 +77,17 @@ def get_luis_result(query):
         data = result["prediction"]["entities"]
         print(data)
 
+        # Try to extract destination
         if "Airport" in data:
             destination = data["Airport"][0][0]
 
+        # Try to extract
         if "datetimeV2" in data:
             dateStruct = data["datetimeV2"]
             date_cell = dateStruct[0]
             date = date_cell["values"][0]["timex"]
 
+        # Try to extract user ID
         if "User ID" in data:
             user_id = data["User ID"][0]
 
@@ -88,6 +96,7 @@ def get_luis_result(query):
         b = CancelBookingDetails(destination=destination, travel_date=date, user_id=user_id)
         return b
 
+    # Handle EditBooking
     if result["prediction"]["topIntent"] == "EditBooking":
         destination = None
         capacity = None
@@ -97,23 +106,25 @@ def get_luis_result(query):
         data = result["prediction"]["entities"]
         print(data)
 
+        # Try to extract destination
         if "Airport" in data:
             destination = data["Airport"][0][0]
 
+        # Try to extract capacity
         if "Capacity" in data:
             capacity = data["Capacity"][0]
 
+        # Try to extract date
         if "datetimeV2" in data:
             dateStruct = data["datetimeV2"]
             date_cell = dateStruct[0]
             date = date_cell["values"][0]["timex"]
 
+        # Try to extract User ID
         if "User ID" in data:
             user_id = data["User ID"][0]
 
         print(destination, capacity, date, user_id)
 
-        b = BookingDetails(destination=destination, capacity=capacity, travel_date=date, user_id=user_id)
+        b = EditBookingDetails(destination=destination, capacity=capacity, travel_date=date, user_id=user_id)
         return b
-
-

@@ -7,7 +7,6 @@ from google.cloud.speech_v1.proto.cloud_speech_pb2 import RecognitionAudio, Reco
 from pydub import AudioSegment
 
 from app import Flight, db, Reservation
-from app.UTILS.GCSObjectStreamUpload import GCSObjectStreamUpload
 from app.UTILS.get_luis_result import get_luis_result
 from app.main.queries.BookingDetails import BookingDetails
 from app.main.queries.CancelBookingDetails import CancelBookingDetails
@@ -144,8 +143,9 @@ def get_flights(body=None):
         number_of_seats = body["number_of_seats"]
         flights = Flight.query.filter(Flight.capacity >= number_of_seats,
                                       Flight.departure > (
-                                      time - timedelta(hours=24) and Flight.departure < (time + timedelta(hours=24)),
-                                      Flight.source == source, Flight.destination == destination).all())
+                                          time - timedelta(hours=24) and Flight.departure < (
+                                                  time + timedelta(hours=24)),
+                                          Flight.source == source, Flight.destination == destination).all())
     else:
         flights = Flight.query.all()
 
@@ -168,12 +168,20 @@ def get_flights(body=None):
 def transcribe_file(file_path):
     """Transcribe the given audio file."""
     print("transcribing")
+
+    # Obtain Google's speech client instance
     client = speech.SpeechClient()
 
+    # Open the received file and get the content
     with io.open(file_path, "rb") as audio_file:
         content = audio_file.read()
 
-    print("Opended file")
+    print("Opened file")
+
+    # Google's recognize function needs:
+    # 1. Audio
+    # 2. The audio format(Config)
+
     audio = RecognitionAudio(content=content)
     config = RecognitionConfig(
         encoding=RecognitionConfig.AudioEncoding.LINEAR16,
@@ -181,24 +189,22 @@ def transcribe_file(file_path):
         language_code="en-US",
     )
 
+    # This is how we translate audio to text
     print("Calling google recognize")
     response = client.recognize(config=config, audio=audio)
     print("Got response")
     print(response)
 
-    if len(response.results)==0 or len(response.results[0].alternatives)==0:
+    if len(response.results) == 0 or len(response.results[0].alternatives) == 0:
         return None
 
+    # Get the transcript out of the returned JSON
     result = response.results[0].alternatives[0].transcript
 
+    # Strip trailing and preciding whitespace and lower the case
     result = result.strip().lower()
 
     return result
-    # Each result is for a consecutive portion of the audio. Iterate through
-    # them to get the transcripts for the entire audio file.
-    # for result in response.results:
-    #    # The first alternative is the most likely one for this portion.
-    #    print(u"Transcript: {}".format(result.alternatives[0].transcript))
 
 
 def parse_intent_from_args(data):
@@ -263,22 +269,37 @@ def parse_intent_from_args(data):
             user_id = str(int(data["user_id"]))
 
         return EditBookingDetails(destination=destination,
-                              travel_date=flight_date, capacity=capacity, user_id=user_id)
+                                  travel_date=flight_date, capacity=capacity, user_id=user_id)
 
 
 def upload(recording, args):
     if args.get("interaction_type") == "voice":
+        # Working with PBX - We just got a voice file
+        # Save the received file
         recording.save("/tmp/recording.wav")
+        # Now Transcribe the file and get the text
         text = transcribe_file("/tmp/recording.wav")
     else:
+        # This is the bot case - text is received as text and not audio
         text = recording
 
+    if text is None:
+        response = {
+            "status": "more_data",
+            "data": args.get("data"),
+            "next": next}
+        return response
+
+
+    # Getting data parameter
     data = args.get("data")
 
+    # If data is none - this is the first interaction. Ask LUIS what it contains
     if data is None:
         result = get_luis_result(text)
         text = "LUIS RESULT"
     else:
+        # Otherwise - PBX or bot sent us the data we required
         print(f"Got data:{data}")
         data = json.loads(data)
         result = parse_intent_from_args(data)
@@ -286,10 +307,12 @@ def upload(recording, args):
         if text is None or text == "":
             raise Exception()
         next = result.variable_to_ask_for(text)
+        # If there are no more variables needed for request, finish the request and update the status.
         if next is None:
             status = result.finish_request()
             print(f"Status is:{status}")
             response = {"status": status}
+        # Otherwise - return the result with a request for the next missing variable.
         else:
             response = {
                 "status": "more_data",

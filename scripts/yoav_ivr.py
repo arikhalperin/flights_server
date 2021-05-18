@@ -108,13 +108,12 @@ def record_message(session):
         "caller_id_number") + ".wav"
     result = do_http_upload("http://46.101.50.94:5000/v1/upload", filename)
 
-    answer =get_data(session, result)
+    answer = get_data(session, result)
 
     if answer["status"]=="OK":
         session.execute('playback', "/usr/share/freeswitch/sounds/yoav_goodbye.wav")
     else:
         session.execute('playback', "/usr/share/freeswitch/sounds/error.wav")
-
 
 
 def hangup_hook(session, what, args=''):
